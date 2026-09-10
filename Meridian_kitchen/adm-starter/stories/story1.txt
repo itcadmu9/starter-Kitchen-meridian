@@ -1,0 +1,19 @@
+Story 2.1 — Create Inventory Stock Schema
+Story ID: MKC-S2-US02-01
+
+User Story
+As a restaurant system, I want a structured InventoryStock table, so that inventory information can be stored consistently.
+
+Acceptance Criteria
+
+An InventoryStock table/entity is created.
+The table contains:
+ingredient
+outlet
+quantity
+reorder_threshold
+A unique identifier/primary key is defined for each inventory record.
+Appropriate data types are assigned to each field.
+Required fields cannot be left empty.
+Database migration/schema can be successfully created.
+Responsibility: Database schema

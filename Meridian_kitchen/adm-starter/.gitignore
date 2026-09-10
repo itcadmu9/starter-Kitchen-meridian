@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Node (for when the React frontend is added)
+node_modules/
+dist/
+
+# Env
+.env
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
