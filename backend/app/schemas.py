@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, EmailStr
 
-from app.models import FolioStatus, ReservationStatus
+from app.models import FolioStatus, ReorderStatus, ReservationStatus
 
 # ---- Guest ----
 
@@ -105,3 +105,67 @@ class AvailabilitySlot(BaseModel):
     capacity: int
     booked: int
     available: bool
+
+
+# ---- Meridian Kitchens vertical (Section 4) ----
+
+
+class InventoryItemCreate(BaseModel):
+    property_id: str
+    name: str
+    category: str
+    quantity: Decimal = Decimal(0)
+    unit: str
+    reorder_threshold: Decimal = Decimal(0)
+
+
+class InventoryItemOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    property_id: str
+    name: str
+    category: str
+    quantity: Decimal
+    unit: str
+    reorder_threshold: Decimal
+    updated_at: datetime
+
+
+class LoyaltyAccountOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    guest_id: str
+    points_balance: Decimal
+    tier: str
+    updated_at: datetime
+
+
+class LoyaltyAdjustment(BaseModel):
+    points_delta: Decimal
+
+
+class ReorderRequestCreate(BaseModel):
+    property_id: str
+    inventory_item_id: str
+    quantity: Decimal
+
+
+class ReorderRequestOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    property_id: str
+    inventory_item_id: str
+    quantity: Decimal
+    status: ReorderStatus
+    requested_at: datetime
+
+
+class AssistantQuery(BaseModel):
+    prompt: str
+
+
+class AssistantReply(BaseModel):
+    response: str

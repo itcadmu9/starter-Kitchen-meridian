@@ -1,0 +1,25 @@
+{
+  "inventory_items": [
+    {
+      "name": "All-Purpose Flour",
+      "category": "dry_goods",
+      "quantity": 40,
+      "unit": "kg",
+      "reorder_threshold": 10
+    },
+    {
+      "name": "Fresh Basil",
+      "category": "produce",
+      "quantity": 3,
+      "unit": "kg",
+      "reorder_threshold": 5
+    }
+  ],
+  "loyalty_accounts": [
+    {
+      "guest_email": "test@example.com",
+      "points_balance": 250,
+      "tier": "silver"
+    }
+  ]
+}

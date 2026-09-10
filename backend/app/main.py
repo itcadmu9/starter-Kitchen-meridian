@@ -5,7 +5,16 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import Base, engine
-from app.routers import availability, folios, guests, reservations
+from app.routers import (
+    assistant,
+    availability,
+    folios,
+    guests,
+    inventory,
+    loyalty,
+    reorder,
+    reservations,
+)
 from app.seed import seed_if_empty
 
 
@@ -41,6 +50,10 @@ app.include_router(reservations.router)
 app.include_router(guests.router)
 app.include_router(folios.router)
 app.include_router(availability.router)
+app.include_router(inventory.router)
+app.include_router(loyalty.router)
+app.include_router(reorder.router)
+app.include_router(assistant.router)
 
 
 @app.get("/health", tags=["health"])

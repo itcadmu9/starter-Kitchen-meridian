@@ -119,3 +119,53 @@ class Order(Base):
     items = Column(JSON, nullable=False, default=list)  # [{ "name", "qty", "price" }, ...]
     total = Column(Numeric(10, 2), nullable=False, default=0)
     placed_at = Column(DateTime, default=utcnow, nullable=False)
+
+
+# ---- Meridian Kitchens vertical entities (Section 4) ----
+
+
+class ReorderStatus(enum.StrEnum):
+    pending = "pending"
+    approved = "approved"
+    ordered = "ordered"
+    received = "received"
+
+
+class InventoryItem(Base):
+    __tablename__ = "inventory_items"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    property_id = Column(String(36), ForeignKey("properties.id"), nullable=False)
+    name = Column(String, nullable=False)
+    category = Column(String, nullable=False)
+    quantity = Column(Numeric(10, 2), nullable=False, default=0)
+    unit = Column(String, nullable=False)
+    reorder_threshold = Column(Numeric(10, 2), nullable=False, default=0)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+    reorder_requests = relationship("ReorderRequest", back_populates="inventory_item")
+
+
+class LoyaltyAccount(Base):
+    __tablename__ = "loyalty_accounts"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    guest_id = Column(String(36), ForeignKey("guests.id"), nullable=False, unique=True)
+    points_balance = Column(Numeric(10, 2), nullable=False, default=0)
+    tier = Column(String, nullable=False, default="bronze")
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+    guest = relationship("Guest")
+
+
+class ReorderRequest(Base):
+    __tablename__ = "reorder_requests"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    property_id = Column(String(36), ForeignKey("properties.id"), nullable=False)
+    inventory_item_id = Column(String(36), ForeignKey("inventory_items.id"), nullable=False)
+    quantity = Column(Numeric(10, 2), nullable=False)
+    status = Column(Enum(ReorderStatus), nullable=False, default=ReorderStatus.pending)
+    requested_at = Column(DateTime, default=utcnow, nullable=False)
+
+    inventory_item = relationship("InventoryItem", back_populates="reorder_requests")

@@ -51,17 +51,39 @@ make seed
 │   │   ├── config.py        Settings from environment variables
 │   │   ├── database.py      SQLAlchemy engine/session (Postgres)
 │   │   ├── mongo.py         Mongo client (guest preference docs)
-│   │   ├── models.py        SQLAlchemy models — the Core Data Model
+│   │   ├── models.py        SQLAlchemy models — the Core Data Model + kitchen vertical entities
 │   │   ├── schemas.py       Pydantic request/response schemas
-│   │   ├── crud.py          DB access functions
+│   │   ├── crud.py          DB access functions (baseline entities)
 │   │   ├── seed.py          Demo data seeding
-│   │   └── routers/         One file per API resource
+│   │   ├── core/             Kitchen vertical: auth/security helpers (stub)
+│   │   ├── services/         Kitchen vertical: inventory/loyalty/reorder/assistant DB access
+│   │   ├── ai/                Kitchen vertical: AI assistant stub
+│   │   └── routers/         One file per API resource (baseline + kitchen vertical)
 │   ├── tests/                pytest suite (SQLite, no Docker required)
 │   ├── pyproject.toml        Dependencies + dev-dependencies + ruff/pytest config
 │   └── uv.lock                Locked dependency versions (committed — don't hand-edit)
-├── docker-compose.yml        Postgres + Mongo + backend
+├── frontend/                  React + Vite app (Meridian Kitchens UI)
+│   └── src/
+│       ├── pages/             Login, Dashboard, Inventory, Loyalty, Reorder, Assistant, Profile
+│       ├── services/          API client wrappers per backend resource
+│       ├── components/, hooks/, context/, styles/
+├── database/
+│   ├── migrations/           Reserved for future schema migrations
+│   └── seed/                  Sample kitchen vertical seed data
+├── documents/                 Reference docs (menu items, allergen guides)
+├── automation/power-automate/ Power Automate flow exports
+├── deployment/{aws,azure}/    Cloud deployment notes/IaC
+├── monitoring/                Observability config
+├── .github/workflows/ci-cd.yml CI: backend lint/test + frontend build
+├── docker-compose.yml        Postgres + Mongo + backend + frontend
 └── .env.example               All environment variables, copy to .env
 ```
+
+## Meridian Kitchens vertical (Section 4)
+
+Adds inventory, loyalty, reorder, and an AI assistant endpoint on top of the
+baseline, at `/api/v1/{inventory,loyalty,reorder,assistant}` — see the routers
+in `backend/app/routers/` and the corresponding pages in `frontend/src/pages/`.
 
 ## Core data model (Section 2.2)
 
