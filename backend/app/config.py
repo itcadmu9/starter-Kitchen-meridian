@@ -18,6 +18,11 @@ class Settings(BaseSettings):
     default_property_capacity: int = 20
     cors_origins: list[str] = ["http://localhost:5173"]
 
+    # Auth (Section 15/16 of the kitchen vertical brief) — used by app/core/security.py.
+    jwt_secret_key: str = "change-me-in-production"  # nosec - override via .env
+    jwt_algorithm: str = "HS256"
+    jwt_expire_minutes: int = 60
+
     # Set to true only by the test suite (see tests/conftest.py) to skip touching
     # the real Postgres/Mongo services during startup.
     testing: bool = False

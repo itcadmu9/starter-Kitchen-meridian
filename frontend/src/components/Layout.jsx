@@ -1,25 +1,54 @@
-import { Link, Outlet } from 'react-router-dom'
+import { useState } from 'react'
+import { NavLink, Outlet } from 'react-router-dom'
 
 const NAV_ITEMS = [
-  { to: '/', label: 'Dashboard' },
-  { to: '/inventory', label: 'Inventory' },
-  { to: '/loyalty', label: 'Loyalty' },
-  { to: '/reorder', label: 'Reorder' },
-  { to: '/assistant', label: 'Assistant' },
-  { to: '/profile', label: 'Profile' },
+  { to: '/', label: 'Overview', end: true },
+  { to: '/inventory', label: 'Inventory Stock' },
+  { to: '/loyalty', label: 'Loyalty Program' },
+  { to: '/assistant', label: 'Menu Assistant' },
 ]
 
 export default function Layout() {
+  const [sidebarOpen, setSidebarOpen] = useState(true)
+
   return (
-    <div>
-      <nav style={{ display: 'flex', gap: '1rem', padding: '1rem', borderBottom: '1px solid #ccc' }}>
-        {NAV_ITEMS.map((item) => (
-          <Link key={item.to} to={item.to}>
-            {item.label}
-          </Link>
-        ))}
-      </nav>
-      <Outlet />
+    <div className="app-shell-wrapper">
+      <div className="topbar">
+        <button
+          type="button"
+          className="hamburger-btn"
+          aria-label="Toggle navigation menu"
+          onClick={() => setSidebarOpen((open) => !open)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+        <span className="brand">Meridian Kitchens</span>
+        <span className="spacer" />
+        <span className="user-tag">Staff</span>
+      </div>
+      <div className="app-shell">
+        <aside className={`sidebar ${sidebarOpen ? '' : 'closed'}`}>
+          <nav>
+            {NAV_ITEMS.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                className={({ isActive }) => (isActive ? 'active' : undefined)}
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+        </aside>
+        <main className="app-main">
+          <Outlet />
+        </main>
+      </div>
     </div>
   )
 }
+
+

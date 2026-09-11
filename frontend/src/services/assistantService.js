@@ -1,5 +1,8 @@
 import api from './api'
 
-export function askAssistant(prompt) {
-  return api.post('/api/v1/assistant', { prompt })
+export async function askAssistant(prompt) {
+  const result = await api.post('/api/v1/assistant', { prompt })
+  return { answer: result.response }
 }
+
+

@@ -33,3 +33,13 @@ def list_low_stock(db: Session, property_id: str | None = None) -> list[models.I
     if property_id:
         query = query.filter(models.InventoryItem.property_id == property_id)
     return query.order_by(models.InventoryItem.name).all()
+
+
+def adjust_quantity(db: Session, item_id: str, quantity_delta) -> models.InventoryItem | None:
+    item = get_inventory_item(db, item_id)
+    if not item:
+        return None
+    item.quantity = max(0, item.quantity + quantity_delta)
+    db.commit()
+    db.refresh(item)
+    return item

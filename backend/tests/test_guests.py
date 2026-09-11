@@ -33,3 +33,17 @@ def test_guest_detail_returns_seeded_preferences(client, db_session, preferences
 def test_guest_not_found_returns_404(client, db_session):
     resp = client.get("/api/v1/guests/does-not-exist")
     assert resp.status_code == 404
+
+
+def test_list_guests_filters_by_email(client, db_session):
+    from tests.factories import make_guest
+
+    make_guest(db_session, name="Ana", email="ana@example.com")
+    make_guest(db_session, name="Ben", email="ben@example.com")
+    db_session.commit()
+
+    resp = client.get("/api/v1/guests", params={"email": "ana"})
+    assert resp.status_code == 200
+    body = resp.json()
+    assert len(body) == 1
+    assert body[0]["email"] == "ana@example.com"

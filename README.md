@@ -55,9 +55,9 @@ make seed
 │   │   ├── schemas.py       Pydantic request/response schemas
 │   │   ├── crud.py          DB access functions (baseline entities)
 │   │   ├── seed.py          Demo data seeding
-│   │   ├── core/             Kitchen vertical: auth/security helpers (stub)
-│   │   ├── services/         Kitchen vertical: inventory/loyalty/reorder/assistant DB access
-│   │   ├── ai/                Kitchen vertical: AI assistant stub
+│   │   ├── core/             Kitchen vertical: auth/security (JWT + bcrypt password hashing)
+│   │   ├── services/         Kitchen vertical: auth/inventory/loyalty/reorder/assistant DB access
+│   │   ├── ai/                Kitchen vertical: rule-based menu/allergen assistant
 │   │   └── routers/         One file per API resource (baseline + kitchen vertical)
 │   ├── tests/                pytest suite (SQLite, no Docker required)
 │   ├── pyproject.toml        Dependencies + dev-dependencies + ruff/pytest config
@@ -81,9 +81,17 @@ make seed
 
 ## Meridian Kitchens vertical (Section 4)
 
-Adds inventory, loyalty, reorder, and an AI assistant endpoint on top of the
-baseline, at `/api/v1/{inventory,loyalty,reorder,assistant}` — see the routers
-in `backend/app/routers/` and the corresponding pages in `frontend/src/pages/`.
+Adds inventory, loyalty, reorder, staff auth, and an AI assistant endpoint on top
+of the baseline, at `/api/v1/{inventory,loyalty,reorder,assistant,auth}` — see the
+routers in `backend/app/routers/` and the corresponding pages in `frontend/src/pages/`.
+Also adds `/api/v1/properties` and `GET /api/v1/guests` (list/search) so the
+frontend can resolve the active outlet and look up guests without hardcoded IDs.
+
+Staff accounts are separate from `Guest` — register at `POST /api/v1/auth/register`
+(`name`, `email`, `password`, `role` of `manager`/`staff`/`admin`), then log in at
+`POST /api/v1/auth/login` to receive a JWT bearer token. Two demo accounts are
+seeded on first boot: `manager@meridiankitchens.com` / `staff@meridiankitchens.com`,
+both with password `meridian123`.
 
 ## Core data model (Section 2.2)
 

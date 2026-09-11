@@ -8,6 +8,11 @@ from app.services import loyalty_service
 router = APIRouter(prefix="/api/v1/loyalty", tags=["loyalty"])
 
 
+@router.get("", response_model=list[schemas.LoyaltyAccountDetail])
+def list_loyalty_accounts(db: Session = Depends(get_db)):
+    return loyalty_service.list_loyalty_accounts(db)
+
+
 @router.get("/{guest_id}", response_model=schemas.LoyaltyAccountOut)
 def get_loyalty_account(guest_id: str, db: Session = Depends(get_db)):
     return loyalty_service.get_or_create_loyalty_account(db, guest_id)

@@ -9,6 +9,11 @@ from app.mongo import get_preferences_collection
 router = APIRouter(prefix="/api/v1/guests", tags=["guests"])
 
 
+@router.get("", response_model=list[schemas.GuestOut])
+def list_guests(email: str | None = None, db: Session = Depends(get_db)):
+    return crud.list_guests(db, email=email)
+
+
 @router.get("/{guest_id}", response_model=schemas.GuestDetail)
 def get_guest(
     guest_id: str,

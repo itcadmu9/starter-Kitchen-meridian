@@ -22,3 +22,19 @@ def create_reorder_request(
     db.commit()
     db.refresh(request)
     return request
+
+
+def get_reorder_request(db: Session, request_id: str) -> models.ReorderRequest | None:
+    return db.query(models.ReorderRequest).filter(models.ReorderRequest.id == request_id).first()
+
+
+def update_status(
+    db: Session, request_id: str, status: schemas.ReorderStatus
+) -> models.ReorderRequest | None:
+    request = get_reorder_request(db, request_id)
+    if not request:
+        return None
+    request.status = status
+    db.commit()
+    db.refresh(request)
+    return request

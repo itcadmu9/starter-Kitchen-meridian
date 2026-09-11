@@ -43,6 +43,17 @@ def get_guest(db: Session, guest_id: str) -> models.Guest | None:
     return db.query(models.Guest).filter(models.Guest.id == guest_id).first()
 
 
+def list_guests(db: Session, email: str | None = None) -> list[models.Guest]:
+    query = db.query(models.Guest)
+    if email:
+        query = query.filter(models.Guest.email.ilike(f"%{email}%"))
+    return query.order_by(models.Guest.name).all()
+
+
+def list_properties(db: Session) -> list[models.Property]:
+    return db.query(models.Property).order_by(models.Property.name).all()
+
+
 def get_folio(db: Session, folio_id: str) -> models.Folio | None:
     return db.query(models.Folio).filter(models.Folio.id == folio_id).first()
 

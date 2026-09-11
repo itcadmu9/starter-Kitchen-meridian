@@ -121,6 +121,26 @@ class Order(Base):
     placed_at = Column(DateTime, default=utcnow, nullable=False)
 
 
+# ---- Staff auth (kitchen vertical) ----
+
+
+class UserRole(enum.StrEnum):
+    manager = "manager"
+    staff = "staff"
+    admin = "admin"
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    name = Column(String, nullable=False)
+    email = Column(String, nullable=False, unique=True, index=True)
+    hashed_password = Column(String, nullable=False)
+    role = Column(Enum(UserRole), nullable=False, default=UserRole.staff)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+
 # ---- Meridian Kitchens vertical entities (Section 4) ----
 
 

@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, EmailStr
 
-from app.models import FolioStatus, ReorderStatus, ReservationStatus
+from app.models import FolioStatus, ReorderStatus, ReservationStatus, UserRole
 
 # ---- Guest ----
 
@@ -142,6 +142,11 @@ class LoyaltyAccountOut(BaseModel):
     updated_at: datetime
 
 
+class LoyaltyAccountDetail(LoyaltyAccountOut):
+    guest_name: str
+    guest_email: str
+
+
 class LoyaltyAdjustment(BaseModel):
     points_delta: Decimal
 
@@ -169,3 +174,42 @@ class AssistantQuery(BaseModel):
 
 class AssistantReply(BaseModel):
     response: str
+
+
+class InventoryQuantityAdjustment(BaseModel):
+    quantity_delta: Decimal
+
+
+class ReorderStatusUpdate(BaseModel):
+    status: ReorderStatus
+
+
+# ---- Staff auth ----
+
+
+class UserCreate(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+    role: UserRole = UserRole.staff
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class UserOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    name: str
+    email: EmailStr
+    role: UserRole
+    created_at: datetime
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserOut

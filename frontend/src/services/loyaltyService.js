@@ -1,5 +1,9 @@
 import api from './api'
 
+export function listLoyaltyAccounts() {
+  return api.get('/api/v1/loyalty')
+}
+
 export function getLoyaltyAccount(guestId) {
   return api.get(`/api/v1/loyalty/${guestId}`)
 }
@@ -7,3 +11,5 @@ export function getLoyaltyAccount(guestId) {
 export function adjustLoyaltyPoints(guestId, pointsDelta) {
   return api.post(`/api/v1/loyalty/${guestId}/adjust`, { points_delta: pointsDelta })
 }
+
+

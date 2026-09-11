@@ -8,3 +8,9 @@ export function listReorderRequests(propertyId) {
 export function createReorderRequest(payload) {
   return api.post('/api/v1/reorder', payload)
 }
+
+export function updateRequestStatus(requestId, status) {
+  return api.patch(`/api/v1/reorder/${requestId}/status`, { status })
+}
+
+

@@ -29,3 +29,13 @@ def get_inventory_item(item_id: str, db: Session = Depends(get_db)):
 @router.post("", response_model=schemas.InventoryItemOut, status_code=201)
 def create_inventory_item(payload: schemas.InventoryItemCreate, db: Session = Depends(get_db)):
     return inventory_service.create_inventory_item(db, payload)
+
+
+@router.patch("/{item_id}/quantity", response_model=schemas.InventoryItemOut)
+def adjust_inventory_quantity(
+    item_id: str, payload: schemas.InventoryQuantityAdjustment, db: Session = Depends(get_db)
+):
+    item = inventory_service.adjust_quantity(db, item_id, payload.quantity_delta)
+    if not item:
+        raise HTTPException(status_code=404, detail="Inventory item not found")
+    return item
