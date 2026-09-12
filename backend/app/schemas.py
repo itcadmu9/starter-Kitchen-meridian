@@ -112,6 +112,7 @@ class AvailabilitySlot(BaseModel):
 
 class InventoryItemCreate(BaseModel):
     property_id: str
+    outlet: str = "Main Kitchen"
     name: str
     category: str
     quantity: Decimal = Decimal(0)
@@ -124,6 +125,7 @@ class InventoryItemOut(BaseModel):
 
     id: str
     property_id: str
+    outlet: str
     name: str
     category: str
     quantity: Decimal
@@ -140,6 +142,31 @@ class LoyaltyAccountOut(BaseModel):
     points_balance: Decimal
     tier: str
     updated_at: datetime
+
+
+class LoyaltyMemberOut(LoyaltyAccountOut):
+    name: str
+    email: EmailStr
+
+
+class InventoryStockUpdate(BaseModel):
+    quantity: Decimal
+
+
+class InventorySummary(BaseModel):
+    total: int
+    in_stock: int
+    low_stock: int
+    out_of_stock: int
+    in_stock_percent: float
+    low_stock_percent: float
+    out_of_stock_percent: float
+
+
+class DashboardOut(BaseModel):
+    property_name: str
+    summary: InventorySummary
+    top_member: LoyaltyMemberOut | None = None
 
 
 class LoyaltyAdjustment(BaseModel):

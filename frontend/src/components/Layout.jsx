@@ -1,25 +1,28 @@
-import { Link, Outlet } from 'react-router-dom'
+import { NavLink, Outlet } from 'react-router-dom'
 
 const NAV_ITEMS = [
-  { to: '/', label: 'Dashboard' },
-  { to: '/inventory', label: 'Inventory' },
-  { to: '/loyalty', label: 'Loyalty' },
-  { to: '/reorder', label: 'Reorder' },
-  { to: '/assistant', label: 'Assistant' },
-  { to: '/profile', label: 'Profile' },
+  { to: '/', label: 'Overview', end: true },
+  { to: '/inventory', label: 'Inventory Stock' },
+  { to: '/loyalty', label: 'Loyalty Program' },
+  { to: '/assistant', label: 'Menu Assistant' },
 ]
 
 export default function Layout() {
   return (
-    <div>
-      <nav style={{ display: 'flex', gap: '1rem', padding: '1rem', borderBottom: '1px solid #ccc' }}>
+    <div className="app-shell">
+      <header className="topbar">
+        <button className="menu-button" type="button" aria-label="Open navigation">☰</button>
+        <strong className="brand">Meridian Kitchens</strong>
+        <span className="staff-label">Staff</span>
+      </header>
+      <nav className="sidebar" aria-label="Main navigation">
         {NAV_ITEMS.map((item) => (
-          <Link key={item.to} to={item.to}>
+          <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
             {item.label}
-          </Link>
+          </NavLink>
         ))}
       </nav>
-      <Outlet />
+      <main className="content"><Outlet /></main>
     </div>
   )
 }

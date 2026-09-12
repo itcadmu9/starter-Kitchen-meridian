@@ -136,6 +136,7 @@ class InventoryItem(Base):
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
     property_id = Column(String(36), ForeignKey("properties.id"), nullable=False)
+    outlet = Column(String, nullable=False, default="Main Kitchen")
     name = Column(String, nullable=False)
     category = Column(String, nullable=False)
     quantity = Column(Numeric(10, 2), nullable=False, default=0)

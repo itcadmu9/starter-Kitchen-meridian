@@ -5,7 +5,6 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Inventory from './pages/Inventory'
 import Loyalty from './pages/Loyalty'
-import Reorder from './pages/Reorder'
 import Assistant from './pages/Assistant'
 import Profile from './pages/Profile'
 
@@ -18,7 +17,6 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="inventory" element={<Inventory />} />
           <Route path="loyalty" element={<Loyalty />} />
-          <Route path="reorder" element={<Reorder />} />
           <Route path="assistant" element={<Assistant />} />
           <Route path="profile" element={<Profile />} />
         </Route>

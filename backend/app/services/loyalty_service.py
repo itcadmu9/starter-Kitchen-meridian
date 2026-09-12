@@ -30,3 +30,13 @@ def adjust_points(db: Session, guest_id: str, points_delta) -> models.LoyaltyAcc
     db.commit()
     db.refresh(account)
     return account
+
+
+def list_members(db: Session, limit: int = 50) -> list[tuple[models.LoyaltyAccount, models.Guest]]:
+    return (
+        db.query(models.LoyaltyAccount, models.Guest)
+        .join(models.Guest, models.Guest.id == models.LoyaltyAccount.guest_id)
+        .order_by(models.LoyaltyAccount.points_balance.desc())
+        .limit(limit)
+        .all()
+    )

@@ -12,6 +12,66 @@ def list_inventory(db: Session, property_id: str | None = None) -> list[models.I
     return query.order_by(models.InventoryItem.name).all()
 
 
+def list_outlets(db: Session, property_id: str | None = None) -> list[str]:
+    query = db.query(models.InventoryItem.outlet).distinct()
+    if property_id:
+        query = query.filter(models.InventoryItem.property_id == property_id)
+    return [row[0] for row in query.order_by(models.InventoryItem.outlet).all()]
+
+
+def paged_inventory(
+    db: Session,
+    property_id: str | None = None,
+    outlet: str | None = None,
+    page: int = 1,
+    page_size: int = 20,
+) -> tuple[list[models.InventoryItem], int]:
+    query = db.query(models.InventoryItem)
+    if property_id:
+        query = query.filter(models.InventoryItem.property_id == property_id)
+    if outlet:
+        query = query.filter(models.InventoryItem.outlet == outlet)
+    total = query.count()
+    items = (
+        query.order_by(models.InventoryItem.name)
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+        .all()
+    )
+    return items, total
+
+
+def inventory_summary(db: Session, property_id: str | None = None) -> dict:
+    items = list_inventory(db, property_id)
+    total = len(items)
+    out_of_stock = sum(item.quantity <= 0 for item in items)
+    low_stock = sum(0 < item.quantity <= item.reorder_threshold for item in items)
+    in_stock = total - out_of_stock - low_stock
+
+    def percent(value: int) -> float:
+        return round(value / total * 100, 1) if total else 0
+
+    return {
+        "total": total,
+        "in_stock": in_stock,
+        "low_stock": low_stock,
+        "out_of_stock": out_of_stock,
+        "in_stock_percent": percent(in_stock),
+        "low_stock_percent": percent(low_stock),
+        "out_of_stock_percent": percent(out_of_stock),
+    }
+
+
+def update_stock(db: Session, item_id: str, quantity) -> models.InventoryItem | None:
+    item = get_inventory_item(db, item_id)
+    if not item:
+        return None
+    item.quantity = quantity
+    db.commit()
+    db.refresh(item)
+    return item
+
+
 def get_inventory_item(db: Session, item_id: str) -> models.InventoryItem | None:
     return db.query(models.InventoryItem).filter(models.InventoryItem.id == item_id).first()
 

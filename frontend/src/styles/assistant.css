@@ -1,0 +1,23 @@
+.chat-panel {
+  height: 500px;
+  min-height: 0;
+}
+
+.chat-body {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+.user-bubble {
+  align-self: flex-end;
+  border-radius: 12px 4px 12px 12px;
+  color: #fff;
+  background: #a8543d;
+}
+
+@media (max-width: 760px) {
+  .chat-panel {
+    height: 460px;
+  }
+}
