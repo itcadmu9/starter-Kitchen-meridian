@@ -3,7 +3,9 @@
 from datetime import date, datetime
 from decimal import Decimal
 
-from pydantic import BaseModel, ConfigDict, EmailStr
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from app.models import FolioStatus, ReorderStatus, ReservationStatus
 
@@ -111,7 +113,7 @@ class AvailabilitySlot(BaseModel):
 
 
 class InventoryItemCreate(BaseModel):
-    property_id: str
+    property_id: str | None = None
     outlet: str = "Main Kitchen"
     name: str
     category: str
@@ -150,7 +152,8 @@ class LoyaltyMemberOut(LoyaltyAccountOut):
 
 
 class InventoryStockUpdate(BaseModel):
-    quantity: Decimal
+    quantity: Decimal = Field(ge=0)
+    action: Literal["add", "remove"] = "add"
 
 
 class InventorySummary(BaseModel):
@@ -167,6 +170,65 @@ class DashboardOut(BaseModel):
     property_name: str
     summary: InventorySummary
     top_member: LoyaltyMemberOut | None = None
+
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class UserOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    name: str
+    email: EmailStr
+    role: str
+    property_id: str | None = None
+    outlet: str | None = None
+
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserOut
+
+
+class MenuItemOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    property_id: str
+    outlet: str
+    name: str
+    price: Decimal
+    ingredients: list[str]
+    allergens: list[str]
+
+
+class TransactionCreate(BaseModel):
+    guest_id: str
+    outlet: str
+    amount: Decimal
+
+
+class TransactionOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    guest_id: str
+    outlet: str
+    amount: Decimal
+    points_earned: Decimal
+    created_at: datetime
+
+
+class TransactionResult(BaseModel):
+    transaction: TransactionOut
+    guest_name: str
+    points_balance: Decimal
+    tier: str
+    tier_changed: bool
 
 
 class LoyaltyAdjustment(BaseModel):
@@ -188,6 +250,20 @@ class ReorderRequestOut(BaseModel):
     quantity: Decimal
     status: ReorderStatus
     requested_at: datetime
+
+
+class ReorderStatusUpdate(BaseModel):
+    status: ReorderStatus
+
+
+class NotificationOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    kind: str
+    message: str
+    created_at: datetime
+    read: str
 
 
 class AssistantQuery(BaseModel):

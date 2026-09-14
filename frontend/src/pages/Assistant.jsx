@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { askAssistant, getFaqAnswer } from '../services/assistantService'
 import '../styles/assistant.css'
 
 export default function Assistant() {
+  const navigate = useNavigate()
   const [prompt, setPrompt] = useState('')
   const [error, setError] = useState(null)
   const [isSending, setIsSending] = useState(false)
   const [messages, setMessages] = useState([
-    { role: 'assistant', text: 'Hello. Ask me about inventory, stock, outlets, or loyalty.' },
+    { role: 'assistant', text: 'Hello. Ask me about menu items, allergens, or dietary options.' },
   ])
   const chatBodyRef = useRef(null)
-  const faqQuestions = ['What needs attention?', 'How do I add stock?', 'How does loyalty work?', 'What outlets are included?']
+  const faqQuestions = ['What allergens are in the menu?', 'Which items are vegetarian?', 'Are there gluten-free options?', 'How do I check dietary information?']
 
   useEffect(() => {
     const chatBody = chatBodyRef.current
@@ -55,7 +57,7 @@ export default function Assistant() {
 
   return (
     <div className="page">
-      <div className="page-heading"><div><p className="eyebrow">Staff support</p><h1>Menu assistant</h1><p>Quick answers for everyday kitchen operations.</p></div></div>
+      <div className="page-heading"><div><p className="eyebrow">Menu support</p><h1>Menu assistant</h1><p>Answers about ingredients, allergens, and dietary options.</p></div><button className="outline-button" type="button" onClick={() => navigate(-1)}>&larr; Back</button></div>
       <section className="assistant-layout">
         <div className="panel faq-panel"><p className="eyebrow">Frequently asked</p><h2>How can I help?</h2><div className="faq-list">{faqQuestions.map((question) => <button type="button" className="faq-button" key={question} onClick={() => askQuestion(question)}>{question}<span>›</span></button>)}</div></div>
         <div className="panel chat-panel"><div className="chat-header"><span className="assistant-mark">✦</span><div><h2>Meridian assistant</h2><span className="muted">FAQ support</span></div></div><div className="chat-body" ref={chatBodyRef}>{messages.map((message, index) => <div className={`chat-bubble ${message.role === 'user' ? 'user-bubble' : 'assistant-bubble'}`} key={`${message.role}-${index}`}>{message.text}</div>)}{isSending && <p className="muted">Thinking...</p>}{error && <p className="alert" role="alert">{error}</p>}</div><form className="chat-form" onSubmit={handleSubmit}><input aria-label="Ask a question" placeholder="Ask a question..." value={prompt} onChange={(event) => setPrompt(event.target.value)} /><button className="primary-button" type="submit" disabled={isSending}>{isSending ? 'Sending...' : 'Send'}</button></form></div>

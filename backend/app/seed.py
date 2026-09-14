@@ -10,6 +10,7 @@ from datetime import date, timedelta
 from app import models
 from app.database import SessionLocal
 from app.models import utcnow
+from app.core.security import hash_password
 from app.mongo import get_preferences_collection
 
 
@@ -76,7 +77,8 @@ def seed_if_empty() -> None:
         locations = ["Chickpet", "Whitefield", "Trinity", "Indiranagar", "Koramangala", "HSR Layout", "Malleshwaram"]
         existing_items = db.query(models.InventoryItem).order_by(models.InventoryItem.name).all()
         for index, item in enumerate(existing_items):
-            item.outlet = locations[index % len(locations)]
+            if item.outlet == "Main Kitchen":
+                item.outlet = locations[index % len(locations)]
             item.unit = "kg"
 
         inventory = [
@@ -91,21 +93,49 @@ def seed_if_empty() -> None:
             ("Chili Powder", "Spices", 0, 3), ("Coriander", "Spices", 8, 3),
             ("Cumin", "Spices", 7, 3), ("Cardamom", "Spices", 2, 2),
         ]
-        existing_names = {item.name for item in existing_items}
-        new_items = [
-            models.InventoryItem(
-                property_id=property_.id,
-                outlet=locations[(len(existing_items) + index) % len(locations)],
-                name=name,
-                category=category,
-                quantity=quantity,
-                unit="kg",
-                reorder_threshold=threshold,
-            )
-            for index, (name, category, quantity, threshold) in enumerate(inventory)
-            if name not in existing_names
-        ]
+        new_items = []
+        for outlet in locations:
+            outlet_names = {item.name for item in existing_items if item.outlet == outlet}
+            for name, category, quantity, threshold in inventory:
+                if len(outlet_names) >= 10:
+                    break
+                if name in outlet_names:
+                    continue
+                new_items.append(models.InventoryItem(
+                    property_id=property_.id,
+                    outlet=outlet,
+                    name=name,
+                    category=category,
+                    quantity=quantity,
+                    unit="kg",
+                    reorder_threshold=threshold,
+                ))
+                outlet_names.add(name)
         db.add_all(new_items)
+
+        menu_items = [
+            ("Chicken Bowl", 450, ["chicken", "rice", "vegetables"], [], "Chickpet"),
+            ("Nutty Pasta", 400, ["pasta", "peanut", "sauce"], ["peanuts"], "Chickpet"),
+            ("Margherita", 350, ["cheese", "tomato", "basil"], ["milk"], "Chickpet"),
+            ("Paneer Tikka", 380, ["paneer", "spices", "peppers"], ["milk"], "Whitefield"),
+            ("Green Garden Bowl", 320, ["spinach", "carrots", "rice"], [], "Whitefield"),
+            ("Chicken Tikka", 420, ["chicken", "yogurt", "spices"], ["milk"], "Trinity"),
+            ("Tandoori Vegetables", 290, ["cauliflower", "peppers", "spices"], [], "Trinity"),
+        ]
+        for name, price, ingredients, allergens, outlet in menu_items:
+            if not db.query(models.MenuItem).filter_by(name=name, outlet=outlet).first():
+                db.add(models.MenuItem(property_id=property_.id, name=name, price=price, ingredients=ingredients, allergens=allergens, outlet=outlet))
+
+        demo_users = [
+            ("Arjun", "staff1@meridian.com", "staff123", models.UserRole.staff, "Chickpet"),
+            ("Neha", "staff2@meridian.com", "staff123", models.UserRole.staff, "Whitefield"),
+            ("Ravi", "staff3@meridian.com", "staff123", models.UserRole.staff, "Trinity"),
+            ("Maya", "staff4@meridian.com", "staff123", models.UserRole.staff, "Indiranagar"),
+            ("Admin Manager", "manager@meridian.com", "manager123", models.UserRole.manager, None),
+        ]
+        for name, email, password, role, outlet in demo_users:
+            if not db.query(models.User).filter_by(email=email).first():
+                db.add(models.User(name=name, email=email, password_hash=hash_password(password), role=role, outlet=outlet, property_id=property_.id))
 
         balances = {
             "Sam Okafor": (7200, "platinum"), "Marcus Ling": (7000, "platinum"),

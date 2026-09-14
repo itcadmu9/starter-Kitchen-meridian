@@ -121,6 +121,47 @@ class Order(Base):
     placed_at = Column(DateTime, default=utcnow, nullable=False)
 
 
+class UserRole(enum.StrEnum):
+    staff = "STAFF"
+    manager = "MANAGER"
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    name = Column(String, nullable=False)
+    email = Column(String, nullable=False, unique=True, index=True)
+    password_hash = Column(String, nullable=False)
+    role = Column(Enum(UserRole), nullable=False, default=UserRole.staff)
+    outlet = Column(String, nullable=True)
+    property_id = Column(String(36), ForeignKey("properties.id"), nullable=True)
+
+
+class MenuItem(Base):
+    __tablename__ = "menu_items"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    property_id = Column(String(36), ForeignKey("properties.id"), nullable=False)
+    outlet = Column(String, nullable=False, default="Main Kitchen")
+    name = Column(String, nullable=False)
+    price = Column(Numeric(10, 2), nullable=False)
+    ingredients = Column(JSON, nullable=False, default=list)
+    allergens = Column(JSON, nullable=False, default=list)
+
+
+class Transaction(Base):
+    __tablename__ = "transactions"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    property_id = Column(String(36), ForeignKey("properties.id"), nullable=False)
+    guest_id = Column(String(36), ForeignKey("guests.id"), nullable=False)
+    outlet = Column(String, nullable=False)
+    amount = Column(Numeric(10, 2), nullable=False)
+    points_earned = Column(Numeric(10, 2), nullable=False, default=0)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+
 # ---- Meridian Kitchens vertical entities (Section 4) ----
 
 
@@ -170,3 +211,14 @@ class ReorderRequest(Base):
     requested_at = Column(DateTime, default=utcnow, nullable=False)
 
     inventory_item = relationship("InventoryItem", back_populates="reorder_requests")
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    property_id = Column(String(36), ForeignKey("properties.id"), nullable=False)
+    kind = Column(String, nullable=False)
+    message = Column(String, nullable=False)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    read = Column(String, nullable=False, default="false")

@@ -1,12 +1,10 @@
 import api from './api'
 
 const FAQ_ANSWERS = [
-  ['needs attention', 'The items needing attention are the ingredients with zero stock. Open Inventory Stock and look for the Out of stock status.'],
-  ['low stock', 'Open Inventory Stock to see ingredients below their reorder threshold. Use the outlet filter to narrow the list.'],
-  ['out of stock', 'Items with zero quantity are marked Out of stock and appear in the inventory status summary.'],
-  ['add stock', 'Open Inventory Stock, select Add stock beside an ingredient, enter the quantity received, and submit.'],
-  ['loyalty', 'Loyalty Program shows the top members first, followed by the guest points balance list.'],
-  ['outlet', 'Inventory combines all Bangalore cloud-kitchen outlets by default. Use the Outlet menu to view one location at a time.'],
+  ['allergen', 'Each menu item lists its allergens below the ingredients. Ask about a specific dish for more detail.'],
+  ['vegetarian', 'Check the ingredients and dietary details on each menu item, or ask about a specific dish.'],
+  ['gluten-free', 'Check the ingredients and allergen information shown on each menu item before ordering.'],
+  ['dietary', 'I can help with ingredients, allergens, and dietary options listed for menu items.'],
 ]
 
 export function askAssistant(prompt) {
