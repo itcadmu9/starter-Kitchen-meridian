@@ -12,7 +12,6 @@ export default function Layout() {
   return (
     <div className={`app-shell ${isManager ? '' : 'staff-shell'}`}>
       <header className="topbar">
-        {isManager && <button className="menu-button" type="button" aria-label="Open navigation">☰</button>}
         <strong className="brand">Meridian Kitchens</strong>
         <span className="staff-label">{user?.role || 'Guest'}</span>
         <button className="logout-button" type="button" onClick={() => { logout(); navigate('/login') }}>Log out</button>

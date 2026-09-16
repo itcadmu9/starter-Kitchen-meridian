@@ -75,20 +75,19 @@ def update_stock(db: Session, item_id: str, quantity, action: str = "add") -> mo
     if not item:
         return None
     item.quantity = item.quantity + quantity if action == "add" else max(item.quantity - quantity, 0)
-    active_request = db.query(models.ReorderRequest).filter(
-        models.ReorderRequest.inventory_item_id == item.id,
-        models.ReorderRequest.status.in_([
-            models.ReorderStatus.pending, models.ReorderStatus.approved, models.ReorderStatus.ordered
-        ]),
-    ).first()
-    if item.quantity <= item.reorder_threshold and not active_request:
-        db.add(models.ReorderRequest(
-            property_id=item.property_id,
-            inventory_item_id=item.id,
-            quantity=max(item.reorder_threshold * 2, 1),
-        ))
-    elif item.quantity > item.reorder_threshold and active_request:
-        active_request.status = models.ReorderStatus.received
+    # Any stock addition is treated as the delivery arriving for whatever reorder is
+    # in flight — managers place new reorders explicitly (Inventory "Reorder" action)
+    # rather than one being auto-recreated here, so a fulfilled request doesn't
+    # immediately spawn a duplicate "still low" entry.
+    if action == "add":
+        active_requests = db.query(models.ReorderRequest).filter(
+            models.ReorderRequest.inventory_item_id == item.id,
+            models.ReorderRequest.status.in_([
+                models.ReorderStatus.pending, models.ReorderStatus.approved, models.ReorderStatus.ordered
+            ]),
+        ).all()
+        for request in active_requests:
+            request.status = models.ReorderStatus.received
     db.commit()
     db.refresh(item)
     return item

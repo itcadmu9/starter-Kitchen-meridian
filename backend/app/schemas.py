@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_serializer, model_validator
 
 from app.models import FolioStatus, ReorderStatus, ReservationStatus
 
@@ -135,6 +135,12 @@ class InventoryItemOut(BaseModel):
     reorder_threshold: Decimal
     updated_at: datetime
 
+    # Serialize as numbers (not strings) so JS comparisons like `quantity <= reorder_threshold`
+    # don't fall back to lexicographic string comparison.
+    @field_serializer("quantity", "reorder_threshold")
+    def serialize_decimal(self, value: Decimal) -> float:
+        return float(value)
+
 
 class LoyaltyAccountOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -250,6 +256,25 @@ class ReorderRequestOut(BaseModel):
     quantity: Decimal
     status: ReorderStatus
     requested_at: datetime
+    inventory_item_name: str | None = None
+    outlet: str | None = None
+    unit: str | None = None
+
+    # Pull display fields off the related InventoryItem so the API doesn't force
+    # clients to resolve inventory_item_id into a name themselves.
+    @model_validator(mode="before")
+    @classmethod
+    def inject_inventory_item(cls, data):
+        item = getattr(data, "inventory_item", None)
+        if item is not None:
+            data.inventory_item_name = item.name
+            data.outlet = item.outlet
+            data.unit = item.unit
+        return data
+
+    @field_serializer("quantity")
+    def serialize_quantity(self, value: Decimal) -> float:
+        return float(value)
 
 
 class ReorderStatusUpdate(BaseModel):

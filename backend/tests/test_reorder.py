@@ -21,7 +21,7 @@ def test_create_and_list_reorder_requests(client, db_session):
         json={"property_id": property_.id, "inventory_item_id": item.id, "quantity": "10"},
     )
     assert resp.status_code == 201
-    assert resp.json()["status"] == "pending"
+    assert resp.json()["status"] == "ordered"
 
     resp = client.get("/api/v1/reorder", params={"property_id": property_.id})
     assert resp.status_code == 200
